@@ -1,5 +1,9 @@
 # AI Engineer Journey
 
+Các nguồn tham khảo: https://ml-cheatsheet.readthedocs.io/en/latest/
+
+
+
 ---
 | Tuần | Notebook | Bài tập | Mục tiêu |
 |------|----------|---------|----------|
