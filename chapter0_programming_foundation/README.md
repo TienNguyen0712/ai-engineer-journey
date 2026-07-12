@@ -150,6 +150,146 @@ def greet(name="Guest"):
 
 ## 1.2. OOP (Hướng đối tượng) [](#1.2)
 
+Giống với các ngôn ngữ lập trình khác thì Python cũng có các phương thức liên quan đến Hướng đối tượng 
+
+**Class (Lớp)**
+
+Lớp giống như một đối tượng lớn chứa tất cả các thuộc tính chung khi muốn gọi một đối tượng mỡi phải xuất phát từ class 
+
+```python
+class Employee: # Lớp nhân viên
+  pass
+```
+
+**Object (Đối tượng)**
+
+Là một thực thể cụ thể được tạo ra từ class. Nó mang các thuộc tính và hành vi riêng 
+
+```python
+class Meo:
+  pass
+
+meo_vang = Meo() # meo_vang là một object
+```
+
+
+**Constructor `(__init__)`**
+
+Hàm khởi tạo từ động chạy ngay khi một đối tượng tạo ra. Dùng để gắn giá trị ban đầu cho thuộc tính của đối tượng
+
+```python
+class Meo:
+    def __init__(self, ten):
+        self.ten = ten # Gán tên ngay khi tạo mèo
+
+meo = Meo("Miu") # Lúc này meo.ten sẽ là "Miu"
+```
+
+**Instance Method**
+
+Là hàm thông thường trong class, hoạt động trực tiếp trên từng Object cụ thể. Luôn có tham số self ở đầu để đại diện cho chính Object đó.
+
+```python
+class Meo:
+    def __init__(self, ten):
+        self.ten = ten
+        
+    def keu(self): # Instance Method
+        return f"{self.ten} kêu meo meo"
+```
+
+**Class Method**
+
+Là hàm quản lý các vấn đề chung của cả Class chứ không riêng gì một Object. Dùng decorator `@classmethod` và nhận tham số đầu tiên là `cls` (chính là Class đó)
+
+```python
+class Meo:
+    so_luong = 0
+    def __init__(self):
+        Meo.so_luong += 1
+        
+    @classmethod
+    def lay_so_luong(cls): # Class Method
+        return f"Tổng số mèo: {cls.so_luong}"
+```
+
+**Static Method**
+
+Là một hàm tiện ích nằm trong Class nhưng hoàn toàn độc lập, không dùng dữ liệu của Object (`self`) hay Class (`cls`). Dùng decorator `@staticmethod`.
+
+```python
+class CungCu:
+    @staticmethod
+    def doi_tieng_meo(chuoi): # Static Method
+        return chuoi.replace("người", "meo")
+```
+
+**Các tính chất hướng đối tượng**
+- Kế thừa (Inheritance)
+  Cho phép một Class con sử dụng lại các thuộc tính và hàm của Class cha, giúp tránh lặp code.
+
+  ```python
+  class DongVat: # Cha
+    def an(self):
+        return "Đang ăn..."
+
+  class Cho(DongVat): # Con kế thừa từ Cha
+      def sua(self):
+          return "Gâu gâu!"
+  
+  milu = Cho()
+  print(milu.an())  # Kế thừa từ cha: "Đang ăn..."
+  print(milu.sua()) # Của riêng con: "Gâu gâu!"
+  ```
+- Đóng gói (Encapsulation)
+  Che giấu dữ liệu bên trong Object để tránh bị bên ngoài sửa đổi lung tung. Trong Python, ta dùng dấu gạch dưới `_ (protect)` hoặc `__ (private)`.
+
+  ```python
+    class TaiKhoan:
+    def __init__(self, so_du):
+        self.__so_du = so_du # Private, bên ngoài không gọi trực tiếp được
+
+    def xem_so_du(self): # Hàm gián tiếp để truy cập an toàn
+        return self.__so_du
+    
+    tk = TaiKhoan(1000)
+    # print(tk.__so_du) # LỖI! Không truy cập được.
+    print(tk.xem_so_du()) # Đúng: 1000
+  ```
+
+- Đa hình (Polymorphism)
+  Cùng một tên hàm nhưng các Class khác nhau sẽ thực hiện theo các cách khác nhau.
+
+  ```python
+  class Cho:
+    def keu(self): return "Gâu gâu"
+
+  class Meo:
+      def keu(self): return "Meo meo"
+  
+  # Hàm nhận vào bất kỳ con gì và bắt nó kêu
+  def lam_cho_keu(dong_vat):
+      print(dong_vat.keu())
+  
+  lam_cho_keu(Cho()) # In ra: Gâu gâu
+  ```
+  
+- Abstract Class (cơ bản)
+  Là một "khung thiết kế" chung. Bạn không thể tạo Object trực tiếp từ Abstract Class, mà bắt buộc các Class con phải kế thừa và định nghĩa cụ thể các hàm của nó. Dùng thư viện `abc`
+  ```python
+  from abc import ABC, abstractmethod
+
+  class Hinh(ABC): # Abstract Class
+      @abstractmethod
+      def tinh_dien_tich(self):
+          pass
+  
+  class HinhVuong(Hinh):
+      def __init__(self, canh):
+          self.canh = canh
+      def tinh_dien_tich(self): # Bắt buộc phải viết hàm này, nếu không sẽ lỗi
+          return self.canh * self.canh
+  ```
 
 
 ## 1.3. Exception  [](#1.3)
@@ -349,6 +489,9 @@ Thao tác chính:
 ## 1.6. JSON [](#1.6)
 ## 1.7. Pandas [](#1.7)
 ## 1.8. Logging [](#1.8)
+
+
+
 ## 1.9. Thư viện [](#1.9)
 
 ---
