@@ -24,7 +24,12 @@ is_student = True # Biến dữ liệu boolean
   - `str()` : Ép về kiểu chuỗi
   - `bool()`: Ép về boolean (True/False)
 - Kiểm tra kiểu dữ liệu
-  -  
+  - `type()`: Xác định kiểu dữ liệu được lưu trữ tỏng biến
+  - `print()`: Xuất giá trị của dữ liệu dược lưu trữ trong biến 
+  - `f_string`: Chuyển thành string
+  - `round()`: Làm tròn số thập phân
+  - `isinstance()`:
+
 ### **Kiểu dữ liệu & Biến**
 ### **Kiểu dữ liệu & Biến**
 ### **Kiểu dữ liệu & Biến**
