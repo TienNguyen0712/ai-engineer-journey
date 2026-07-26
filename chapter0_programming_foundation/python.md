@@ -6,6 +6,13 @@
 
 ### **Kiểu dữ liệu & Biến**
 
+```python
+name = "john" # Đây là biến dữ liệu là sting
+age = 20 # Biến dữ liệu số
+height = 1.72 # Biến dữ liệu số thập phân
+is_student = True # Biến dữ liệu boolean 
+```
+
 - **Kiểu dữ liệu trong Python**
   - `Integer`: Là kiểu dữ liệu số nguyên (`1`, `2`)
   - `floats`: Là kiểu dữ liệu số nguyên (`1`, `2`)
