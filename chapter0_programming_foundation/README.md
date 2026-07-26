@@ -5,30 +5,6 @@
 
 > Mục tiệu: Thành thạo thao tác câu lệnh trong `Python`
 
-## 1.1. Biến & Kiểu dữ liệu [](#1.1)
-
-Biến giống như là để định nghĩa hoặc nói đơn giản chính là tên gọi lưu trữ cho một giá trị (số, string, text, boolean) dữ liệu:
-
-```python
-name = "john" # Đây là biến dữ liệu là sting
-age = 20 # Biến dữ liệu số
-height = 1.72 # Biến dữ liệu số thập phân
-is_student = True # Biến dữ liệu boolean 
-```
-
-**Bên cạnh đó ta cũng có các kiểu dữ liệu:**
-- `str`: Kiểu dữ liệu string 
-- `int`: Kiểu dữ liệu số nguyên
-- `float`: Kiểu dữ liệu số thực
-- `bool`: Kiểu dữ liệu boolean (True / False)
-
-### 1.1.1. Các câu lệnh phổ biến sử dụng 
-- `type()`: Xác định kiểu dữ liệu được lưu trữ tỏng biến
-- `id()`:
-- `print()`: Xuất giá trị của dữ liệu dược lưu trữ trong biến 
-- `f_string`: Chuyển thành string
-- `round()`: Làm tròn số thập phân 
-
 ### 1.1.2. Collection (Tập hợp)
 
 Giống như các ngôn ngữ lập trình khác các tập hợp được xem là lưu trữ nhiều biến được khai báo trong một chương trình 
