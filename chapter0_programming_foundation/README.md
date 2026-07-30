@@ -1,9 +1,47 @@
-# Phase 1. Nền tảng lập trình 
+# 🗺️ Phase 1. Nền tảng lập trình 
 > **Mục tiêu**: Code sạch, chuẩn kỹ thuật, Có thể mở rộng
 ---
 ## 1.1 Nền tảng Python 
 
-### 1.1.2. Collection (Tập hợp)
+### **Kiểu dữ liệu & Biến**
+
+- `integer:` Là các biến số nguyên - Ép kiểu về dạng này sử dụng `int()`
+- `floats:` Là các biến số thực - Ép kiểu về dạng này sử dụng `float()`
+- `str():` Là các biến dạng chuỗi - Ép kiểu về dạng này sử dụng `str()`
+- `bool()` Là các biến đúng sai dạng _True/False_ - Ép kiểu về dạng này sử dụng `bool()`
+- `type():` Dùng để kiểm tra kiểu dữ liệu của biến
+- `isinstance(object, classinfo):` Dùng để kiểm tra một đối tượng có thuộc về một kiểu dữ liệu hoặc một lớp nhất định hay không
+- **Mutable:** Sau khỉ khởi tạo ta có thể chỉnh sửa nội dung bên trong vùng nhớ của nó **mà không làm thay đổi địa chỉ id** của đối tượng\
+  - _Ví dụ:_ list, dict, set, torch.Tensor
+- **Immutable:** Sau khi dã tạo, giá trị bên trong vùng nhớ **không bao giờ được thay đổi**. Bất kỳ thao tác nào thực hiện đều tạo ra một đối tượng mới với vùng nhớ mới
+  - _Ví dụ:_ int, float, str, ..  
+
+| Thành phần Pipeline | Nên dùng kiểu | Thư viện / Data Type khuyên dùng | Rủi ro nếu làm sai (Why it matters) | Best Practice cụ thể |
+| :--- | :--- | :--- | :--- | :--- |
+| **Model & Pipeline Config** | Immutable | `dataclasses` (`frozen=True`), `NamedTuple`, `Hydra DictConfig` | **Data Leakage / Non-reproducible Runs:** Config bị sửa ngầm (mutation side-effects) giữa các bước Train/Val/Test làm mất tính đồng nhất của thực nghiệm. | Khóa hoàn toàn config sau khi parse. Không bao giờ truyền `dict` thuần làm config cho các hàm xử lý dữ liệu. |
+| **Category Mapping & Class Labels** | Immutable | `tuple`, `frozenset`, `enum.Enum` | **Index Corruption:** Thứ tự class ID bị lệch giữa quá trình Training và Inference (ví dụ: `0: "cat"` bị đổi thành `0: "dog"` do append mảng). | Khai báo hằng số mapping dạng `Tuple[str, ...]` hoặc `Enum` để cố định index và ngăn chặn hàm khác `append()`/`insert()`. |
+| **Feature Caching & Hash Keys** | Immutable | `str`, `tuple`, `bytes` | **TypeError (Unhashable):** Các decorator như `@lru_cache` hoặc Redis Key đòi hỏi input phải hashable. `list`/`dict` sẽ làm crash pipeline. | Ép kiểu các tham số feature/path sang `tuple` hoặc `str` trước khi truyền vào hàm cache. |
+| **Dataset In-Memory Buffers** | Mutable | `torch.Tensor`, `np.ndarray`, `pandas.DataFrame` | **Out Of Memory (OOM):** Nếu lạm dụng Immutable (tạo copy liên tục) với mảng dữ liệu lớn, RAM/VRAM sẽ bị tràn nhanh chóng. | Sử dụng Mutable data structures nhưng **hạn chế in-place operation** (`inplace=True`, `tensor.add_()`) trong graph tính toán của PyTorch/TensorFlow. |
+| **Data Augmentation & Preprocessing** | Immutable (Input)<br>Mutable (Output) | PyTorch `Transforms`, `albumentations` | **Dataset Corruption:** Biến đổi trực tiếp trên mảng gốc khiến dữ liệu của Epoch 2 bị đè bởi biến đổi của Epoch 1. | Luôn trả về một tensor/array mới (`copy()`) trong hàm `__getitem__` của DataLoader, giữ nguyên raw sample gốc. |
+| **Experiment Metrics & State Logging** | Mutable | `MLflow`, `W&B`, custom accumulator (`list`/`dict`) | **Missing Logs / Race Conditions:** Cố tình xài hằng số hoặc tuple sẽ khiến việc append metric theo epoch trở nên cồng kềnh. | Gom metric theo từng step vào `dict` tạm thời, sau đó ghi sang tracking system (MLflow/W&B) và giải phóng bộ nhớ. |
+
+### **Chuỗi**
+
+- Cắt chuổi dùng: `s[start:stop:step]`
+  - **start:** Ví trí bắt đầu cắt 
+  - **stop:** Ví trí kết thúc cắt 
+  - **step:** Bước nhảy cắt
+- `split()`: Chia chuổi theo ký tự `" "` - theo khoảng trắng 
+- `join()`: Gộp chuổi theo ký tự chèn vào `" "` - theo khoảng trắng 
+- `strip()`: Loại bỏ khoảng trắng đầu và cuối chuổi 
+- `replace()`: Thay thế chuỗi 
+- `find()`: Tìm kiếm ký tự trong chuỗi
+- `startswith(obj)`: Bắt đầu bằng ký tự `obj` trong chuỗi 
+- `endswith(obj)`: Kết thúc bằng ký tự `obj` trong chuỗi
+- f-string: `f"value is {x:.2f}"` - trong dấu `{}` là biến cần truyền để in ra màn hình
+- Ngoài ra có thể sử dụng `""" """` để chèn một string dài
+
+### Collection (Tập hợp)
 
 Giống như các ngôn ngữ lập trình khác các tập hợp được xem là lưu trữ nhiều biến được khai báo trong một chương trình 
 
@@ -38,7 +76,7 @@ tuple = (1, 2, 3, 5)
 - Ứng dụng đặc biệt: Dùng để unpack dữ liệu: `x, y = (10, 20)`.
 
 
-**Set (Tập hợp)**
+**Sets (Tập hợp)**
 
 - Dặc điểm là không cho phép trùng lặp, không quan tâm đến thứ tự và các dữ liệu được đặt trong dấu `{}`
 - Có thể thay đổi được
@@ -75,7 +113,30 @@ my_dict = {'name': 'An', 'age': 20}
   - `my_dict.values()`: Lấy toàn bộ Value.
   - `my_dict.items()`: Lấy cặp (Key, Value) dưới dạng Tuple.
 
-### 1.1.3. Function (Hàm)
+### Control Flow
+
+- `if` điều kiện - `elif` điều kiện khác - `else` điều kiện cuối 
+- `for` vòng lặp - `for i in list` lặp các phần tử trong list - `for i, j in dict.items()` lặp các phần tử trong dict - `for i in ranges(10)` lặp từ 0 đến 9
+- `while` lặp - `break` điều kiện thỏa thì dừng lại - `continues` thỏa điều kiện thì tiếp tục 
+- `range`: Chỉ vùng dữ liệu
+- `enumerate(chuỗi cần đuyệt, giá trị bắt đầu=0)`: Duyệt phần tử kèm chỉ số 
+- `zip()`: Ghép song song nhiều danh sách 
+
+```python
+feature_names = ["age", "income", "credit_score"]
+feature_importance = [0.15, 0.65, 0.20]
+
+# Ghép song song 2 list
+for name, importance in zip(feature_names, feature_importance):
+    print(f"Feature '{name}': {importance}")
+
+# Kết quả:
+# Feature 'age': 0.15
+# Feature 'income': 0.65
+# Feature 'credit_score': 0.20
+```
+
+## 1.2. Function (Hàm)
 
 Hầu hết các chương trình đều được viết dựa trên hàm, giống như là một tập hợp các bước thao tác của một tác vụ nào đó. 
 Để định nghĩa một hàm ta dùng `def`
@@ -122,7 +183,7 @@ def greet(name="Guest"):
 --- 
 
 
-## 1.2. OOP (Hướng đối tượng) [](#1.2)
+## 1.3. OOP (Hướng đối tượng) [](#1.2)
 
 Giống với các ngôn ngữ lập trình khác thì Python cũng có các phương thức liên quan đến Hướng đối tượng 
 
