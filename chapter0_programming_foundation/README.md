@@ -1,9 +1,7 @@
 # Phase 1. Nền tảng lập trình 
-> ⭐ Mục này lưu trữ lý thuyết và bài tập liên quan đến `Python` + `Git` + `SQL`
+> **Mục tiêu**: Code sạch, chuẩn kỹ thuật, Có thể mở rộng
 ---
-# ☑️ 1. Python [](#1)
-
-> Mục tiệu: Thành thạo thao tác câu lệnh trong `Python`
+## 1.1 Nền tảng Python 
 
 ### 1.1.2. Collection (Tập hợp)
 
