@@ -135,6 +135,7 @@ for name, importance in zip(feature_names, feature_importance):
 # Feature 'income': 0.65
 # Feature 'credit_score': 0.20
 ```
+---
 
 ## 1.2. Function (Hàm)
 
@@ -179,6 +180,60 @@ def greet(name="Guest"):
 
 - Local: là biến khi khai báo trong hàm ta sẽ sử dụng nó trong hàm và khi ra ngoài hàm thì sẽ không được sử dụng
 - Global: là biến có thể sử dụng ở bất cứ đầu trong chương trình
+- `*args`: Cho phép gom các tham số vị trí không cố định thành một `tuple`
+- `**kwargs`: Cho phép gom các tham số vị trí không cố định thành một `dict`
+  - `*args` và `**kwargs` giúp tùy nghi truyền thêm tham số mà không cần làm vỡ code, giúp mở rộng, sửa code dễ dàng
+
+**Lambda function**
+
+Hay gọi là hàm vô danh là hàm nhỏ, chỉ chứa một biểu thức duy nhất và không có tên khi khai báo 
+
+```python
+lambda arguments: expression
+
+# Hàm thông thường
+def add_one(x):
+    return x + 1
+
+# Viết tương đương bằng Lambda
+add_one_lambda = lambda x: x + 1
+
+print(add_one_lambda(5)) # Kết quả: 6
+```
+
+**Đệ quy**
+
+Là kỹ thuật mà một hàm tự gọi lại chính nó, chia nhỏ một bài toán lớn thành các bài toán nhỏ
+- Điều kiện dừng gọi lại chính nó
+- Bước đệ quy là nơi hàm gọi lại chính nó với bài toán có quy mô nhỏ hơn
+
+**Docstrings**
+
+Là chuỗi văn bản dặt đầu hàm, class, hoặc module giải thích chức năng, tham số và kết quả trả về. Giúp IDE hiển thị gợi ý
+- Chuẩn viết DocStrings trong Python AI DSK
+
+```python
+def train_epoch(model: object, dataloader: object, optimizer: object) -> float:
+    """Thực hiện huấn luyện mô hình qua một epoch dữ liệu.
+
+    Args:
+        model (object): Mô hình PyTorch/TensorFlow cần huấn luyện.
+        dataloader (object): DataLoader chứa dữ liệu theo từng batch.
+        optimizer (object): Thuật toán tối ưu hóa (vd: Adam, SGD).
+
+    Returns:
+        float: Giá trị Loss trung bình của cả Epoch.
+
+    Raises:
+        ValueError: Nếu DataLoader rỗng.
+    """
+    if len(dataloader) == 0:
+        raise ValueError("DataLoader không chứa dữ liệu!")
+    
+    # Giả lập logic tính loss
+    total_loss = 0.5
+    return total_loss
+```
 
 --- 
 
@@ -222,7 +277,7 @@ meo = Meo("Miu") # Lúc này meo.ten sẽ là "Miu"
 
 **Instance Method**
 
-Là hàm thông thường trong class, hoạt động trực tiếp trên từng Object cụ thể. Luôn có tham số self ở đầu để đại diện cho chính Object đó.
+Là hàm thông thường trong class, hoạt động trực tiếp trên từng Object cụ thể. Luôn có tham số `self` ở đầu để đại diện cho chính Object đó.
 
 ```python
 class Meo:
@@ -261,7 +316,7 @@ class CungCu:
 
 **Các tính chất hướng đối tượng**
 - Kế thừa (Inheritance)
-  Cho phép một Class con sử dụng lại các thuộc tính và hàm của Class cha, giúp tránh lặp code.
+  Cho phép một Class con sử dụng lại các thuộc tính và hàm của Class cha, giúp tránh lặp code thông qua từ khóa `super()`.
 
   ```python
   class DongVat: # Cha
@@ -309,7 +364,7 @@ class CungCu:
   lam_cho_keu(Cho()) # In ra: Gâu gâu
   ```
   
-- Abstract Class (cơ bản)
+- Abstract Class (Lớp trừu tượng)
   Là một "khung thiết kế" chung. Bạn không thể tạo Object trực tiếp từ Abstract Class, mà bắt buộc các Class con phải kế thừa và định nghĩa cụ thể các hàm của nó. Dùng thư viện `abc`
   ```python
   from abc import ABC, abstractmethod
@@ -326,8 +381,107 @@ class CungCu:
           return self.canh * self.canh
   ```
 
+**Các phương thức khác**
+
+- `__str__`, `__repr__`: Chuyển đổi đối tượng thành String
+  - `__str__`: Dùng để hiển thị cho Người dùng cuối (End-user). Ưu tiên tính dễ đọc, thân thiện. Gọi khi dùng print(obj) hoặc str(obj).
+  - `__repr__`: Dùng cho Developer / Debugging. Yêu cầu tính chính xác, ngắn gọn, hiển thị rõ kiểu Class và thông số chính để tái tạo Object. Gọi khi dùng repr(obj) hoặc gõ tên biến trong console/Jupyter Notebook.
+
+```python
+class LLMModel:
+    def __init__(self, name: str, temperature: float):
+        self.name = name
+        self.temperature = temperature
+
+    def __str__(self) -> str:
+        # Thân thiện với người dùng
+        return f"Mô hình LLM: {self.name} (độ sáng tạo: {self.temperature})"
+
+    def __repr__(self) -> str:
+        # Định danh kỹ thuật cho Developer
+        return f"LLMModel(name='{self.name}', temperature={self.temperature})"
+
+model = LLMModel("GPT-4o", 0.7)
+print(str(model))   # Output: Mô hình LLM: GPT-4o (độ sáng tạo: 0.7)
+print(repr(model))  # Output: LLMModel(name='GPT-4o', temperature=0.7)
+```
+
+- `__len__`, `__getitem__`: Class hoạt động thành List hoặc Dict (truy cập bằng chỉ số)
+  - Dataset trong PyTorch bắt buộc phải implement 2 hàm này để DataLoader có thể chia batch và iterate qua dữ liệu.
+```python
+import torch
+from torch.utils.data import Dataset
+
+class TextDataset(Dataset):
+    def __init__(self, texts: list[str], labels: list[int]):
+        self.texts = texts
+        self.labels = labels
+
+    def __len__(self) -> int:
+        # Trả về tổng số lượng sample trong dataset
+        return len(self.texts)
+
+    def __getitem__(self, idx: int) -> dict:
+        # Định nghĩa cách lấy ra 1 sample tại chỉ số idx
+        return {
+            "text": self.texts[idx],
+            "label": torch.tensor(self.labels[idx])
+        }
+
+dataset = TextDataset(["Học Python AI", "MLOps chuyên nghiệp"], [1, 1])
+print(len(dataset))       # Output: 2 (thông qua __len__)
+print(dataset[0])         # Output: {'text': 'Học Python AI', 'label': tensor(1)} (thông qua __getitem__)
+```
+
+**Các Decorator vói lớp tĩnh trong Python**
+
+| Decorator | Cú pháp phương thức | Tham số bắt buộc | Bản chất & Mục đích chính | Trường hợp sử dụng tiêu biểu trong AI / MLOps |
+| :--- | :--- | :--- | :--- | :--- |
+| **`@property`** | `def my_attribute(self):` | `self` | Biến một Method thành Attribute (chỉ đọc hoặc có validation). Cho phép truy cập dạng `obj.my_attribute` thay vì `obj.my_attribute()`. | • Kiểm tra trạng thái GPU/RAM khả dụng.<br>• Tính toán dynamic attribute (vd: `is_v2`, `embedding_dim`).<br>• Bảo vệ biến nội bộ không bị sửa đổi trực tiếp. |
+| **`@classmethod`** | `def my_factory(cls, ...):` | `cls` (đại diện cho Class) | Tác động lên cấp độ Class thay vì Instance. Thường dùng làm **Factory Methods** để khởi tạo Object từ nhiều nguồn dữ liệu khác nhau. | • `Model.from_pretrained("bert-base")`<br>• `Config.from_json(json_str)`<br>• `Dataset.from_pandas(df)` |
+| **`@staticmethod`** | `def my_utility(...):` | Không nhận `self` hay `cls` | Là một hàm tiện ích (Utility function) độc lập, được nhóm vào bên trong Class cho gọn scope/namespace. Không truy cập trạng thái Class hay Instance. | • Preprocessing/Clean văn bản (`clean_text()`).<br>• Validate format đường dẫn file config.<br>• Helper math operations độc lập. |
+| **`@abstractmethod`** | `def predict(self, x):` | `self` (hoặc `cls`) | Đi kèm với `ABC` (Abstract Base Class) để tạo khung thiết kế. **Bắt buộc** các Class con kế thừa phải viết code triển khai phương thức này. | • Định nghĩa Base Provider chuẩn LangChain/LlamaIndex (`BaseLLM`, `BaseVectorStore`).<br>• Interface chung cho Custom PyTorch Pipeline/Transform. |
+
+```python
+import json
+
+class PromptTemplate:
+    def __init__(self, template: str, version: float):
+        self.template = template
+        self.version = version
+
+    # 1. @property: Truy cập như thuộc tính, ngăn sửa đổi trực tiếp nếu muốn
+    @property
+    def is_v2(self) -> bool:
+        return self.version >= 2.0
+
+    # 2. @classmethod: Factory method tạo instance từ nguồn khác (Config/JSON)
+    @classmethod
+    def from_json(cls, json_str: str):
+        data = json.loads(json_str)
+        return cls(template=data["template"], version=data["version"])
+
+    # 3. @staticmethod: Utility function xử lý chuỗi đơn thuần
+    @staticmethod
+    def sanitize_input(user_input: str) -> str:
+        return user_input.strip().replace("\n", " ")
+
+# Sử dụng:
+# Classmethod (Factory)
+json_data = '{"template": "Dịch văn bản: {text}", "version": 2.1}'
+prompt_obj = PromptTemplate.from_json(json_data)
+
+# Property
+print(prompt_obj.is_v2)  # Output: True (không cần gọi prompt_obj.is_v2())
+
+# Staticmethod
+clean_str = PromptTemplate.sanitize_input("   Prompt có newline \n  ")
+print(clean_str)         # Output: "Prompt có newline  "
+```
+
 
 ## 1.3. Exception  [](#1.3)
+
 
 Trong quá trình xây dựng một chương trình nào đó ta sẽ phải đối mặt với những lỗi như kiểu dữ liệu không đúng, file không tồn tại, ... Exception ra đời nhằm giám sát chất lượng dữ liệu, xây dựng một hệ thống 
 có thể tự phục hồi và tìm ra lỗi tự động giảm tải bớt nhân công và thời gian 
