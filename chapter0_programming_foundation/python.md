@@ -794,7 +794,14 @@ for chunk in stream_llm_response():
 
 ---
 
-## 1.8. NumPy (Nền tảng tính toán Mảng)Thư viện lõi cho đại số tuyến tính và xử lý mảng đa chiều trong Python.Tạo mảng & Thuộc tính cơ bảnPythonimport numpy as np
+## 1.8. NumPy (Nền tảng tính toán Mảng)
+
+Thư viện lõi cho đại số tuyến tính và xử lý mảng đa chiều trong Python.
+
+**Tạo mảng & Thuộc tính cơ bản**
+
+```python
+import numpy as np
 
 arr = np.array([[1, 2, 3], [4, 5, 6]])
 print(arr.shape)  # Dimensions: (2, 3)
@@ -804,27 +811,76 @@ print(arr.dtype)  # Kiểu dữ liệu: int64
 zeros = np.zeros((3, 3))
 ones = np.ones((2, 4))
 eye = np.eye(3)   # Ma trận đơn vị
-Thay đổi hình dạng (Reshaping) & Nối mảng (Stacking)reshape(): Thay đổi kích thước mảng mà không đổi dữ liệu.flatten(): Chuyển mảng thành 1D (tạo ra copy mới).ravel(): Chuyển mảng thành 1D (trả về view nếu có thể, tiết kiệm bộ nhớ).np.vstack(), np.hstack(), np.stack(): Ghép các mảng theo chiều dọc/ngang/chiều mới.Indexing nâng cao & BroadcastingBoolean Indexing: Lọc dữ liệu theo điều kiện logic.np.where(condition, x, y): Chọn $x$ nếu thỏa điều kiện, ngược lại chọn $y$.Broadcasting Rules: Cho phép thực hiện phép toán giữa các mảng khác kích thước nếu thỏa mãn điều kiện tương thích về shape (ví dụ: cộng ma trận với một vector).Pythondata = np.array([10, 25, 30, 5])
+```
+
+**Thay đổi hình dạng (Reshaping) & Nối mảng (Stacking)**
+-  reshape(): Thay đổi kích thước mảng mà không đổi dữ liệu.
+-  flatten(): Chuyển mảng thành 1D (tạo ra copy mới).
+-  ravel(): Chuyển mảng thành 1D (trả về view nếu có thể, tiết kiệm bộ nhớ).
+-  np.vstack(), np.hstack(), np.stack(): Ghép các mảng theo chiều dọc/ngang/chiều mới.
+
+**Indexing nâng cao & Broadcasting**
+- **Boolean Indexing:** Lọc dữ liệu theo điều kiện logic.
+- np.where(condition, x, y): Chọn $x$ nếu thỏa điều kiện, ngược lại chọn $y$.
+- **Broadcasting Rules:** Cho phép thực hiện phép toán giữa các mảng khác kích thước nếu thỏa mãn điều kiện tương thích về shape (ví dụ: cộng ma trận với một vector).
+
+```python
+data = np.array([10, 25, 30, 5])
 filtered = data[data > 15]  # [25, 30]
 replaced = np.where(data > 15, 1, 0)  # [0, 1, 1, 0]
-Phép toán Ma trận & AggregationsPhép nhân ma trận: Sử dụng np.dot(A, B) hoặc toán tử @.np.linalg.inv(): Tìm ma trận nghịch đảo.np.linalg.eig(): Tìm trị riêng và vector riêng.Aggregations: np.mean(), np.sum(), np.std(), np.argmax() kèm theo tham số axis (ví dụ: axis=0 cho cột, axis=1 cho dòng).Pythonmatrix = np.array([[1, 2], [3, 4]])
+```
+
+**Phép toán Ma trận & Aggregations**
+
+- Phép nhân ma trận: Sử dụng np.dot(A, B) hoặc toán tử @.
+- np.linalg.inv(): Tìm ma trận nghịch đảo.
+- np.linalg.eig(): Tìm trị riêng và vector riêng.
+- **Aggregations:** np.mean(), np.sum(), np.std(), np.argmax() kèm theo tham số axis (ví dụ: axis=0 cho cột, axis=1 cho dòng).Pythonmatrix = np.array([[1, 2], [3, 4]])
+
+```python
 # Nhân ma trận
 result = matrix @ matrix
 # Tìm chỉ số max theo dòng
 max_idx = np.argmax(matrix, axis=1)
-1.9. Pandas (Xử lý và Phân tích Dữ liệu Bảng)Thư viện chuẩn để thao tác với Tabular Data (DataFrame & Series).Khởi tạo & Khảo sát Dữ liệuPythonimport pandas as pd
+```
+--- 
+
+## 1.9. Pandas (Xử lý và Phân tích Dữ liệu Bảng)
+
+Thư viện chuẩn để thao tác với Tabular Data (DataFrame & Series).
+
+**Khởi tạo & Khảo sát Dữ liệu**
+
+```python
+import pandas as pd
 
 df = pd.read_csv("data.csv")
 print(df.head(5))       # 5 dòng đầu
 print(df.info())        # Thông tin kiểu dữ liệu và giá trị Null
 print(df.describe())    # Thống kê mô tả (Mean, Std, Min, Max, Quantiles)
 print(df.shape)         # Kích thước (rows, cols)
-Truy xuất & Lọc dữ liệu (loc vs iloc)loc: Truy xuất bằng Nhãn (Label/Name) của dòng và cột.iloc: Truy xuất bằng Chỉ số nguyên (Integer Index).Python# Lọc bằng loc (Boolean Mask)
+```
+
+**Truy xuất & Lọc dữ liệu (loc vs iloc)** 
+- loc: Truy xuất bằng Nhãn (Label/Name) của dòng và cột.
+- iloc: Truy xuất bằng Chỉ số nguyên (Integer Index).
+
+```python
+# Lọc bằng loc (Boolean Mask)
 high_income = df.loc[df['income'] > 50000, ['name', 'income']]
 
 # Lọc bằng iloc (hàng từ 0 đến 5, cột từ 0 đến 2)
 subset = df.iloc[0:5, 0:2]
-Xử lý Missing Dataisna() / isnull(): Kiểm tra giá trị thiếu.dropna(): Bỏ bớt các dòng/cột chứa giá trị Null.fillna(): Điền giá trị thay thế (Mean, Median, Mode hoặc gán cố định).Gom nhóm & Biến đổi (GroupBy, Reshape, Merge)GroupBy & Aggregation: df.groupby('category').agg({'price': 'mean', 'id': 'count'})Merge (Join): Kết nối các DataFrame tương tự SQL (inner, left, right, outer).Concat: Nối theo chiều dọc hoặc chiều ngang.Pivot Table & Melt: Soay và tái cấu trúc dạng bảng (Wide vs Long format).Datetime Parsing: pd.to_datetime() - chuyển cột chuỗi sang kiểu thời gian để trích xuất year, month, day.1.10. Code Quality & Cấu trúc Dự án (Software Engineering Practices)Biến các đoạn code dạng script thành một Dự án phần mềm chuẩn mực, sẵn sàng bảo trì.Môi trường ảo & Quản lý Phụ thuộcTạo môi trường cách ly dependency để tránh xung đột phiên bản:Bashpython -m venv .venv
+```
+
+**Xử lý Missing Data**
+- isna() / isnull(): Kiểm tra giá trị thiếu.
+- dropna(): Bỏ bớt các dòng/cột chứa giá trị Null.
+- fillna(): Điền giá trị thay thế (Mean, Median, Mode hoặc gán cố định).
+
+**Gom nhóm & Biến đổi (GroupBy, Reshape, Merge)**
+- **GroupBy & Aggregation:** df.groupby('category').agg({'price': 'mean', 'id': 'count'})
+- **Merge (Join):** Kết nối các DataFrame tương tự SQL (inner, left, right, outer).Concat: Nối theo chiều dọc hoặc chiều ngang.Pivot Table & Melt: Soay và tái cấu trúc dạng bảng (Wide vs Long format).Datetime Parsing: pd.to_datetime() - chuyển cột chuỗi sang kiểu thời gian để trích xuất year, month, day.1.10. Code Quality & Cấu trúc Dự án (Software Engineering Practices)Biến các đoạn code dạng script thành một Dự án phần mềm chuẩn mực, sẵn sàng bảo trì.Môi trường ảo & Quản lý Phụ thuộcTạo môi trường cách ly dependency để tránh xung đột phiên bản:Bashpython -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 # Hoặc dùng conda: conda create -n ai_env python=3.10
 Lưu và cài đặt danh sách thư viện: pip freeze > requirements.txt và pip install -r requirements.txt.Cấu trúc Module & PackageThêm file __init__.py vào thư mục để biến thư mục đó thành một Python Package.Tách code thành các submodule rõ ràng (data/, models/, utils/).Type Hints & DataclassesType Hints: Khai báo kiểu dữ liệu cho tham số và giá trị trả về giúp IDE hiển thị gợi ý và bắt lỗi tĩnh.dataclasses: Tạo lớp chứa dữ liệu thuần túy một cách nhanh chóng mà không cần viết boilerplate __init__.Pythonfrom dataclasses import dataclass
