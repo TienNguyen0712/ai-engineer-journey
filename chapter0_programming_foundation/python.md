@@ -479,8 +479,160 @@ clean_str = PromptTemplate.sanitize_input("   Prompt có newline \n  ")
 print(clean_str)         # Output: "Prompt có newline  "
 ```
 
+## 1.4. Pythonic Code 
 
-## 1.3. Exception  [](#1.3)
+Cách sử dụng code chuẩn Python 
+
+- **Comprehension:** Giúp tạo list, dict, set bằng cú pháp 1 dòng trong khi đó
+
+```python
+# List comprehension: Lấy danh sách độ dài các từ
+words = ["python", "ai", "engineering"]
+word_lens = [len(w) for w in words]  # [6, 2, 11]
+
+# Dict comprehension: Map tên feature với index (dùng tạo Vocabulary)
+vocab = ["<pad>", "<unk>", "cat", "dog"]
+token2id = {token: idx for idx, token in enumerate(vocab)}
+# {'<pad>': 0, '<unk>': 1, 'cat': 2, 'dog': 3}
+
+# Set comprehension: Lấy tập hợp các class duy nhất từ dự đoán
+predictions = ["cat", "dog", "cat", "bird", "dog"]
+unique_classes = {p for p in predictions}  # {'cat', 'dog', 'bird'}
+```
+
+- **Genenerator Experssions:** Xử lý dữ liệu lớn mà không làm tràn RAM. Dùng ngoặc `()` và chỉ tính toán từng phần tử khi được yêu cầu
+
+```python
+# GIẢ SỬ: File chứa 10 triệu dòng text
+# BAD: Nạp cả 10 triệu dòng vào RAM dưới dạng List
+# memory_heavy = [clean_text(line) for line in open("huge_corpus.txt")]
+
+# GOOD: Dùng Generator Expression, RAM dùng chỉ ~0 MB
+memory_efficient = (line.strip().lower() for line in open("huge_corpus.txt"))
+
+# Duyệt từng dòng một để xử lý / đưa vào pipeline
+first_sample = next(memory_efficient)
+```
+- `map()`: Áp dụng một hàm lên toàn bộ phần tử của chuỗi dữ liệu
+- `filter()`: Lọc các phần tử thỏa mãn điều kiện trả về `True`
+- `reduce()`: Tích lũy hàm 2 tham số lên lần lượt các phần tử từ trái sang phải để rút gọn tập hợp thành 1 giá trị duy nhất
+- Unpaking: `a, b, *rest = lst`: Trích xuất các phần tử trong danh sách thành 1 biến riêng lẻ
+```python
+# Lấy phần tử đầu, phần tử cuối và gom tất cả phần còn lại
+batch_data = ["sample_0", "sample_1", "sample_2", "sample_3", "target"]
+
+first_sample, *middle_samples, label = batch_data
+
+print(first_sample)     # 'sample_0'
+print(middle_samples)    # ['sample_1', 'sample_2', 'sample_3']
+print(label)             # 'target'
+```
+
+- `any()`: Trả về `True` nếu có ít nhất 1 phần tử là `True`
+- `all()`: Trả về `True` nếu tất cả phần tử là `True` 
+- `sorted()`: Sắp xếp theo chỉ đinh trong hàm 
+- `collection` :
+  - `Counter`: Đếm tần suất phần tử
+  - `defaultdict`: Tự động khởi tạo giá trị mặc định cho một key chưa tồn tại khi bạn truy cập hoặc gán giá trị.
+  
+  ```python
+  from collections import defaultdict
+  # Khai báo value mặc định là một list
+  category_to_files = defaultdict(list)
+  
+  # Không cần kiểm tra 'if category in dict:' nữa
+  category_to_files["images"].append("img1.png")
+  category_to_files["images"].append("img2.png")
+  category_to_files["labels"].append("label1.txt")
+  
+  print(dict(category_to_files))
+  # {'images': ['img1.png', 'img2.png'], 'labels': ['label1.txt']}
+  ```
+  - `deque`: Hành chờ cấu trúc dữ liệu
+
+---
+ 
+## 1.5. File handing [](#1.4)
+
+Các thao tác quan trọng như: 
+
+**Đọc file**
+
+Để có thể đọc file ta sử dụng từ khóa `with`
+
+```python
+with open("data.txt", "r") as file:
+  content = file.read()
+```
+
+Thao tác chính: 
+- Với data.txt chính là tên file ta muốn đọc
+- as file: Tên biến lưu để thực hiện trong chương trình
+- Từ khóa "r" thể hiện thao tác đọc
+- content = file.read(): Biến content lưu toàn bộ nội dung của file
+
+**Đọc từng dòng trong file**
+
+```python
+with open("data.txt") as file:
+    for line in file:
+        print(line.strip())
+```
+
+Thao tác chính: 
+- Duyệt từng dòng trong file và xóa khoảng trắng giữa chúng
+
+**Ghi file**
+
+```python
+with open("output.txt", "w") as file:
+    file.write("Hello")
+```
+
+Thao tác chính: 
+- Với output.txt chính là tên file ta muốn ghi
+- as file: Tên biến lưu để thực hiện trong chương trình
+- Từ khóa "w" thể hiện thao tác ghi
+- file.write(): Ghi nội dung mới trong file
+
+**Append**
+-Thêm dòng mới vào trong file
+
+```python
+with open("log.txt", "a") as file:
+    file.write("New log\n")
+```
+
+Thao tác chính: 
+- Với log.txt chính là tên file ta muốn ghi
+- as file: Tên biến lưu để thực hiện trong chương trình
+- Từ khóa "a" thể hiện tha
+```python
+# Đọc
+with open("students.csv") as file:
+    reader = csv.DictReader(file) # Xác định đọc file
+    for row in reader:
+        print(row)
+
+# Ghi
+with open("students.csv", "w", newline="") as file:
+  writer = csv.writer(file)
+  writer.writerow(["id","name","score"]) # Thêm cột mới
+  writer.writerow([1,"An",8.5]) # Thêm dòng mới
+```
+
+Thao tác chính: 
+- Với students.csv chính là tên file ta muốn ghio tác thêm mới vào trong file
+- file.write(): Ghi nội dung mới trong file lưu ý thêm có `\n` xuống dòng
+
+**Thao tác với file csv**
+
+- Để đọc và ghi file csv ta cần khai báo thư viện `imoport csv`
+- `os`: Thao tác hệ thống cũ hơn, làm việc với đường dẫn dạng chuỗi string
+- `pathlib.Path`: Thao tác đường dẫn theo hướng đối tượng (Khuyên dùng)
+- `glob`: Tìm kiếm filke theo pattern (`*.jpg`)
+
+## 1.6. Sửa lỗi & Debugging  [](#1.3)
 
 
 Trong quá trình xây dựng một chương trình nào đó ta sẽ phải đối mặt với những lỗi như kiểu dữ liệu không đúng, file không tồn tại, ... Exception ra đời nhằm giám sát chất lượng dữ liệu, xây dựng một hệ thống 
@@ -557,6 +709,7 @@ finally:
 **Raise**
 
 Chủ động ép chương trình ném ra (kích hoạt) một lỗi khi dữ liệu vi phạm logic nghiệp vụ (mặc dù code không sai cú pháp).
+- **raise:** Chủ động ném lỗi khi dữ liệu vi phạm nghiệp vụ.
 
 ```python
 def check_replicate_count(count):
@@ -574,6 +727,8 @@ except ValueError as e:
 **Custom Exception**
 
 Tự tạo ra một loại lỗi mới bằng cách kế thừa lớp `Exception`, giúp định nghĩa tường minh tên lỗi theo đúng nghiệp vụ của dự án.
+- Custom Exception: Tạo lớp kế thừa từ Exception để quản lý lỗi theo domain AI.
+
 
 ```python
 # Tự định nghĩa một Class kế thừa từ lớp Exception gốc của Python
@@ -591,84 +746,135 @@ except EmptyPipelineError as e:
     print(f"Cảnh báo hệ thống: {e}")
 ```
 
+**Logging**
+
+Thay thế hoàn toàn cho lệnh `print()` trong code nghiệp vụ. Cung cấp các mức độ `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+
+- `breakpoint()` / `pdb`: Dừng chwuong trình lại để xem biến trức tiếp từ Terminal
+
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.info("Bắt đầu huấn luyện mô hình...")
+
+# Đặt điểm dừng Debug
+x = 10
+# breakpoint() # Chương trình sẽ dừng lại ở đây để tương tác CLI
+```
+
+--- 
+
+## 1.7. Hiệu suất và Bộ nhớ
+
+Chiến lược giúp tối ưu hiệu năng tính toán và quản lý dung lượng RAM/VRAM.
+
+- **Generators & `yield`**: Cho phép viết hàm trả về dữ liệu từng phần một dưới dạng Stream mà không nạp toàn bộ vào RAM cùng một lúc. Rất quan trọng khi xử lý streaming token từ LLM.Pythondef stream_llm_response():
+
+```python
+tokens = ["Xin", "chào", "bạn", "tôi", "là", "AI"]
+    for token in tokens:
+        yield token
+
+for chunk in stream_llm_response():
+    print(chunk, end=" ")
+```
+
+- **Thư viện `itertools`**: Tạo ra các con lặp hiệu năng cao (C-speed) phục vụ cho tính toán tổ hợp.
+  - `itertools.chain()`: Nối nhiều iterable.
+  - `itertools.islice()`: Cắt lát generator.
+  - `itertools.product()`: Tích Cartesian (dùng làm Grid Search hyperparameter đơn giản).
+- **Benchmarking** (`timeit`, `cProfile`)
+  - `timeit`: Đo thời gian thực thi của một đoạn code nhỏ.
+  - `cProfile`: Phân tích hiệu năng (profiling) xem hàm nào tốn nhiều thời gian nhất trong ứng dụng.
+- **Shallow vs Deep Copy**:
+  - **Shallow Copy (`copy.copy()`):** Tạo đối tượng mới nhưng giữ nguyên tham chiếu đến các đối tượng con mutable bên trong.
+  - **Deep Copy (`copy.deepcopy()`)**: Sao chép toàn bộ đối tượng và tất cả các đối tượng con một cách độc lập hoàn toàn.
+- **Vectorization (Vector hóa)**: Thay thế vòng lặp Python thuần (`for` loop) bằng các thao tác vector hóa của NumPy/PyTorch. Các phép toán này được viết bằng C/CUDA mang lại tốc độ nhanh hơn từ 10x đến 100x.
 
 ---
 
-## 1.4. File handing [](#1.4)
+## 1.8. NumPy (Nền tảng tính toán Mảng)Thư viện lõi cho đại số tuyến tính và xử lý mảng đa chiều trong Python.Tạo mảng & Thuộc tính cơ bảnPythonimport numpy as np
 
-Các thao tác quan trọng như: 
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+print(arr.shape)  # Dimensions: (2, 3)
+print(arr.ndim)   # Số chiều: 2
+print(arr.dtype)  # Kiểu dữ liệu: int64
 
-**Đọc file**
+zeros = np.zeros((3, 3))
+ones = np.ones((2, 4))
+eye = np.eye(3)   # Ma trận đơn vị
+Thay đổi hình dạng (Reshaping) & Nối mảng (Stacking)reshape(): Thay đổi kích thước mảng mà không đổi dữ liệu.flatten(): Chuyển mảng thành 1D (tạo ra copy mới).ravel(): Chuyển mảng thành 1D (trả về view nếu có thể, tiết kiệm bộ nhớ).np.vstack(), np.hstack(), np.stack(): Ghép các mảng theo chiều dọc/ngang/chiều mới.Indexing nâng cao & BroadcastingBoolean Indexing: Lọc dữ liệu theo điều kiện logic.np.where(condition, x, y): Chọn $x$ nếu thỏa điều kiện, ngược lại chọn $y$.Broadcasting Rules: Cho phép thực hiện phép toán giữa các mảng khác kích thước nếu thỏa mãn điều kiện tương thích về shape (ví dụ: cộng ma trận với một vector).Pythondata = np.array([10, 25, 30, 5])
+filtered = data[data > 15]  # [25, 30]
+replaced = np.where(data > 15, 1, 0)  # [0, 1, 1, 0]
+Phép toán Ma trận & AggregationsPhép nhân ma trận: Sử dụng np.dot(A, B) hoặc toán tử @.np.linalg.inv(): Tìm ma trận nghịch đảo.np.linalg.eig(): Tìm trị riêng và vector riêng.Aggregations: np.mean(), np.sum(), np.std(), np.argmax() kèm theo tham số axis (ví dụ: axis=0 cho cột, axis=1 cho dòng).Pythonmatrix = np.array([[1, 2], [3, 4]])
+# Nhân ma trận
+result = matrix @ matrix
+# Tìm chỉ số max theo dòng
+max_idx = np.argmax(matrix, axis=1)
+1.9. Pandas (Xử lý và Phân tích Dữ liệu Bảng)Thư viện chuẩn để thao tác với Tabular Data (DataFrame & Series).Khởi tạo & Khảo sát Dữ liệuPythonimport pandas as pd
 
-Để có thể đọc file ta sử dụng từ khóa `with`
+df = pd.read_csv("data.csv")
+print(df.head(5))       # 5 dòng đầu
+print(df.info())        # Thông tin kiểu dữ liệu và giá trị Null
+print(df.describe())    # Thống kê mô tả (Mean, Std, Min, Max, Quantiles)
+print(df.shape)         # Kích thước (rows, cols)
+Truy xuất & Lọc dữ liệu (loc vs iloc)loc: Truy xuất bằng Nhãn (Label/Name) của dòng và cột.iloc: Truy xuất bằng Chỉ số nguyên (Integer Index).Python# Lọc bằng loc (Boolean Mask)
+high_income = df.loc[df['income'] > 50000, ['name', 'income']]
 
-```python
-with open("data.txt", "r") as file:
-  content = file.read()
-```
+# Lọc bằng iloc (hàng từ 0 đến 5, cột từ 0 đến 2)
+subset = df.iloc[0:5, 0:2]
+Xử lý Missing Dataisna() / isnull(): Kiểm tra giá trị thiếu.dropna(): Bỏ bớt các dòng/cột chứa giá trị Null.fillna(): Điền giá trị thay thế (Mean, Median, Mode hoặc gán cố định).Gom nhóm & Biến đổi (GroupBy, Reshape, Merge)GroupBy & Aggregation: df.groupby('category').agg({'price': 'mean', 'id': 'count'})Merge (Join): Kết nối các DataFrame tương tự SQL (inner, left, right, outer).Concat: Nối theo chiều dọc hoặc chiều ngang.Pivot Table & Melt: Soay và tái cấu trúc dạng bảng (Wide vs Long format).Datetime Parsing: pd.to_datetime() - chuyển cột chuỗi sang kiểu thời gian để trích xuất year, month, day.1.10. Code Quality & Cấu trúc Dự án (Software Engineering Practices)Biến các đoạn code dạng script thành một Dự án phần mềm chuẩn mực, sẵn sàng bảo trì.Môi trường ảo & Quản lý Phụ thuộcTạo môi trường cách ly dependency để tránh xung đột phiên bản:Bashpython -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# Hoặc dùng conda: conda create -n ai_env python=3.10
+Lưu và cài đặt danh sách thư viện: pip freeze > requirements.txt và pip install -r requirements.txt.Cấu trúc Module & PackageThêm file __init__.py vào thư mục để biến thư mục đó thành một Python Package.Tách code thành các submodule rõ ràng (data/, models/, utils/).Type Hints & DataclassesType Hints: Khai báo kiểu dữ liệu cho tham số và giá trị trả về giúp IDE hiển thị gợi ý và bắt lỗi tĩnh.dataclasses: Tạo lớp chứa dữ liệu thuần túy một cách nhanh chóng mà không cần viết boilerplate __init__.Pythonfrom dataclasses import dataclass
 
-Thao tác chính: 
-- Với data.txt chính là tên file ta muốn đọc
-- as file: Tên biến lưu để thực hiện trong chương trình
-- Từ khóa "r" thể hiện thao tác đọc
-- content = file.read(): Biến content lưu toàn bộ nội dung của file
+@dataclass(frozen=True)  # frozen=True biến instance thành Immutable
+class ModelConfig:
+    model_name: str
+    learning_rate: float = 0.001
+    batch_size: int = 32
 
-**Đọc từng dòng trong file**
+config = ModelConfig(model_name="ResNet18")
+Testing, Linting & FormattingUnit Testing với pytest: Viết test tự động cho các hàm quan trọng.Linters (ruff / flake8): Kiểm tra lỗi cú pháp và chuẩn PEP8.Formatters (black): Tự động format code theo chuẩn thống nhất.1.11. Python cho AI WorkflowsCác công cụ trợ lực cho chu trình nghiên cứu, phát triển và thử nghiệm mô hình AI.Môi trường Interactive & Tiến trìnhJupyter Notebooks / Google Colab: Môi trường thử nghiệm nhanh, hỗ trợ GPU/TPU miễn phí. Sử dụng các Magic commands như %timeit, %matplotlib inline.tqdm: Tạo thanh tiến trình (progress bar) cho các vòng lặp huấn luyện dài.Pythonfrom tqdm import tqdm
+import time
 
-```python
-with open("data.txt") as file:
-    for line in file:
-        print(line.strip())
-```
+for epoch in tqdm(range(100), desc="Training Model"):
+    time.sleep(0.01)
+Quản lý Tham số CLI & Configargparse: Truyền tham số trực tiếp từ dòng lệnh khi thực thi script.YAML / Hydra Config: Quản lý cấu hình mô hình tập trung từ các file .yaml ngoại vi.python-dotenv (.env): Lưu trữ an toàn các hằng số nhạy cảm như API Keys mà không lo dính vào Git.Pythonimport os
+from dotenv import load_dotenv
 
-Thao tác chính: 
-- Duyệt từng dòng trong file và xóa khoảng trắng giữa chúng
+load_dotenv()  # Nạp các biến từ file .env
+api_key = os.getenv("OPENAI_API_KEY")
+Tái lập thực nghiệm (Reproducibility) & Lưu trữSeeding: Cố định seed cho tất cả các thư viện sinh số ngẫu nhiên để đảm bảo thực nghiệm có thể tái lập 100%.Pythonimport random
+import numpy as np
+import torch
 
-**Ghi file**
+def set_seed(seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+Lưu trữ mô hình: joblib.dump(), torch.save().1.12. Async Python (Lập trình Bất đồng bộ cho AI APIs)Kiến thức bắt buộc để xây dựng các ứng dụng tương tác với LLM APIs (OpenAI, Claude, vLLM) nhằm tối ưu latency và throughput.Cơ chế async / await & Event LoopLập trình bất đồng bộ cho phép chương trình thực hiện các công việc khác trong thời gian chờ phản hồi I/O (ví dụ: chờ API trả về token) thay vì chặn toàn bộ hệ thống (blocking).Pythonimport asyncio
 
-```python
-with open("output.txt", "w") as file:
-    file.write("Hello")
-```
+async def fetch_llm_response(prompt: str) -> str:
+    print(f"Đang gửi prompt: {prompt}")
+    await asyncio.sleep(2)  # Giả lập lệnh chờ I/O từ Network
+    return f"Response cho: {prompt}"
 
-Thao tác chính: 
-- Với output.txt chính là tên file ta muốn ghi
-- as file: Tên biến lưu để thực hiện trong chương trình
-- Từ khóa "w" thể hiện thao tác ghi
-- file.write(): Ghi nội dung mới trong file
+async def main():
+    result = await fetch_llm_response("Hello AI")
+    print(result)
 
-**Append**
--Thêm dòng mới vào trong file
+# Chạy Event Loop
+asyncio.run(main())
+Thực thi đồng thời với asyncio.gather()Gửi nhiều request API cùng một lúc thay vì gọi tuần tự từng request.Pythonasync def process_batch_prompts(prompts: list[str]):
+    # Gửi song song tất cả các prompts sang API
+    tasks = [fetch_llm_response(p) for p in prompts]
+    results = await asyncio.gather(*tasks)
+    return results
 
-```python
-with open("log.txt", "a") as file:
-    file.write("New log\n")
-```
+# Tốc độ phản hồi sẽ bằng thời gian request chậm nhất, thay vì tổng thời gian tất cả request
+Async HTTP Clients (httpx, aiohttp)Sử dụng các thư viện hỗ trợ Async Native để làm việc với REST APIs hoặc Server-Sent Events (SSE) khi Streaming LLM Responses.Thư việnĐặc điểmTrường hợp sử dụngrequestsSynchronous (Blocking)Script đơn giản, không yêu cầu concurrency cao.httpxHỗ trợ cả Sync & AsyncChuẩn Production mới, được OpenAI SDK và FastAPI tích hợp sẵn.aiohttpAsync thuần túyHệ thống Async lớn, giao tiếp WebSocket hoặc Streaming pipeline nặng.Tại sao Streaming LLM lại cần Async?Các mô hình Generative AI sinh dữ liệu dưới dạng chuỗi các token theo thời gian. Sử dụng Async kết hợp với Async Generators (async for ... in ...) cho phép client nhận và render từng token lên giao diện người dùng ngay lập tức khi nó vừa được tạo ra mà không làm đứng (freeze) luồng xử lý chính của ứng dụng.
 
-Thao tác chính: 
-- Với log.txt chính là tên file ta muốn ghi
-- as file: Tên biến lưu để thực hiện trong chương trình
-- Từ khóa "a" thể hiện thao tác thêm mới vào trong file
-- file.write(): Ghi nội dung mới trong file lưu ý thêm có `\n` xuống dòng
-
-**Thao tác với file csv**
-
-- Để đọc và ghi file csv ta cần khai báo thư viện `imoport csv`
-
-```python
-# Đọc
-with open("students.csv") as file:
-    reader = csv.DictReader(file) # Xác định đọc file
-    for row in reader:
-        print(row)
-
-# Ghi
-with open("students.csv", "w", newline="") as file:
-  writer = csv.writer(file)
-  writer.writerow(["id","name","score"]) # Thêm cột mới
-  writer.writerow([1,"An",8.5]) # Thêm dòng mới
-```
-
-Thao tác chính: 
-- Với students.csv chính là tên file ta muốn ghi
 
