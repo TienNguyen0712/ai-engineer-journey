@@ -11,7 +11,7 @@
   - [Vector](#vector)
   - [Ma trận (Matrices)](#ma-tran)
   - [Phép toán Ma trận trong Học máy](#phep-toan-ma-tran)
-  - [Giảm chiều](#giam-chieu)
+  - [Phân rã](#phan-ra)
 - [2.2 Giải tích](#22-giai-tich)
 - [2.3 Xác suất & Thống kê](#23-xac-suat-thong-ke)
 - [2.4 Tối ưu hóa](#24-toi-uu-hoa)
@@ -91,82 +91,66 @@ $$\text{Cosine Similarity}(\vec{a}, \vec{b}) = \cos(\theta) = \frac{\vec{a} \cdo
 | **Nhân ma trận** | Phần tử hàng i cột j của ma trận nhân với hàng j cột i của ma trận kia rồi cộng chúng lại|
 | **Chuyển vị** | Chuyển các phần tử hàng cảu ma rận thành cột và ngược lại |
 
+**Phép nhân theo từng phần tử & Tích ma trận**
+
+- Với phép nhân theo từng phần tử
+- Ký hiệu: $A \odot B$ hoặc $A \circ B$ (trong NumPy/PyTorch là A * B).
+  - **Điều kiện:** Hai ma trận phải có cùng kích thước $(m \times n)$.
+  - **Cách tính:** Nhân từng vị trí tương ứng:
+
+$$\begin{bmatrix} a & b \\ c & d \end{bmatrix} \odot \begin{bmatrix} e & f \\ g & h \end{bmatrix} = \begin{bmatrix} a \cdot e & b \cdot f \\ c \cdot g & d \cdot h \end{bmatrix}$$
+
+- Với phép Tích ma trận
+  - Ký hiệu: $A \cdot B$ hoặc $AB$ (trong NumPy/PyTorch là A @ B hoặc torch.matmul).
+    - **Điều kiện:** Số cột của $A$ phải bằng số hàng của $B$ ($(m \times k) \cdot (k \times n) \rightarrow (m \times n)$).
+    - **Cách tính:** Hàng của $A$ nhân vô hướng (dot product) với Cột của $B$.
+
+Tích ma trận $A \cdot B$ chính là sự tổng hợp của các phép biến đổi không gian. Áp dụng ma trận $B$ lên không gian trước, sau đó áp dụng tiếp ma trận $A$.
+
+$$\begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} e & f \\ g & h \end{bmatrix} = \begin{bmatrix} ae+bg & af+bh \\ ce+dg & cf+dh \end{bmatrix}$$
+
+**Ma trận đơn vị & Nghịch đảo**
+- Ma trận đơn vị ký hiệu là $I$ là ma trận vuông có các phần tử trên đường chéo cính bằng 1 và các phần tử còn lại bằng 0
+  - Là phép biến đổi không gian khi nhân một ma trận A cho $I$ thì không gian không bị thay đổi
+- Ma trận $A^-1$ là nghịch đảo của $A$ khi thỏa mãn: $$A \cdot A^{-1} = A^{-1} \cdot A = I$$
+ 
+**Định thức**
+- Ký hiệu là $\det(A)$ hoặc $\vert{}A\vert{}$, là **một hệ số số thực**
+- Định thức đo lường mức độ thay đổi Diện tích (trong 2D) hoặc Thể tích (trong 3D/nD) của một không gian sau khi bị biến đổi bởi ma trận $A$.
+
+- $\det(A) = 1$: Không gian thay đổi hình dạng nhưng thể tích được bảo toàn.
+- $\det(A) = 3$: Không gian phóng to ra, thể tích tăng gấp 3 lần.
+- $\det(A) = 0$: Không gian bị ép bẹp dí mất đi 1 hoặc nhiều chiều (ví dụ: biến một mặt phẳng 2D thành một đường thẳng 1D, hoặc biến thể tích 3D thành 2D).
+- $\det(A) < 0$: Không gian bị lật ngược (giống như lật mặt bàn tay / gương soi) đồng thời thể tích co/dãn theo $\vert{} \det(A) \vert{}$.
+
+**Hạng của ma trận**
+
+- **Hạng (Rank)** của ma trận $A$ đại diện cho số chiều thực sự của không gian đầu ra sau phép biến đổi, hoặc số lượng hàng/cột độc lập tuyến tính tối đa trong ma trận.
+- Giả sử ta có một ma trận $3 \times 3$ (nhận đầu vào là không gian 3D):
+  - Rank = 3 (Full Rank): Đầu ra vẫn là một không gian 3D đầy đủ. Không có thông tin nào bị ép phẳng. $\det(A) \neq 0$.
+  - Rank = 2: Ma trận ép toàn bộ không gian 3D rơi xuống thành một mặt phẳng 2D.
+  - Rank = 1: Ma trận ép toàn bộ không gian 3D rơi xuống thành một đường thẳng 1D.
+  - Rank = 0: Toàn bộ không gian bị nén thành một điểm duy nhất (điểm gốc $0$).
+$$\text{Rank}(A) \le \min(\text{số hàng}, \text{số cột})$$
 
 ---
 
-<a id="collection-tap-hop"></a>
-### 🔹 Collection (Tập hợp)
 
-Dùng để lưu trữ nhiều biến trong một chương trình.
+<a id="phep-toan-ma-tran"></a>
+### 🔹 Phép toán Ma trận trong Học máy
 
-#### List (Danh sách)
+**Biến đổi tuyến tính**
 
-- Lưu trữ nhiều dữ liệu, **cho phép trùng lặp**, đặt trong dấu `[]`.
-- Có thể lồng nhau, có thể thay đổi được (mutable). Thường dùng cho danh sách có thứ tự.
+- Một ma trận $A \in \mathbb{R}^{m \times n}$ không chỉ là một bảng chứa thông tin, mà bản chất của nó là một **hàm số/ánh xạ** nhận đầu vào là một vectơ $\vec{x} \in \mathbb{R}^n$ và biến đổi nó thành một vectơ mới $T(\vec{x}) = A\vec{x} \in \mathbb{R}^m$.
 
-```python
-my_list = [1, 2, 3, 4, 5]
-```
-
-| Thao tác | Cú pháp |
-|---|---|
-| Truy cập | `list[0]` (đầu), `list[-1]` (cuối) |
-| Cắt lát (Slicing) | `list[1:3]` (từ index 1 đến 2) |
-| Thêm | `append(x)`, `insert(index, x)`, `extend(iterable)` |
-| Xóa | `pop()` (xóa cuối, trả về giá trị), `remove(x)` (xóa phần tử đầu tiên có giá trị x) |
-| Sắp xếp | `sort()` (thay đổi trực tiếp) hoặc `sorted(my_list)` (trả về list mới) |
-
-#### Tuple (Bộ)
-
-- Giống List nhưng **không thể thay đổi** sau khi tạo, đặt trong dấu `()`.
-- Dùng lưu trữ dữ liệu cố định, bảo vệ dữ liệu không bị sửa đổi.
-
-```python
-my_tuple = (1, 2, 3, 5)
-```
-
-| Thao tác | Cú pháp |
-|---|---|
-| Truy cập | Giống List: `my_tuple[0]`, `my_tuple[:2]` |
-| Chỉnh sửa | Không có |
-| Tìm kiếm | `count(x)` (đếm số lần xuất hiện), `index(x)` (tìm vị trí của x) |
-| Unpack dữ liệu | `x, y = (10, 20)` |
-
-#### Sets (Tập hợp)
-
-- **Không cho phép trùng lặp**, không quan tâm thứ tự, đặt trong dấu `{}`. Có thể thay đổi được.
-- Dùng cho các phép toán tập hợp, tìm phần tử duy nhất.
-
-```python
-my_set = {1, 2, 3, 5}
-# Khởi tạo set rỗng: set() (KHÔNG dùng {} vì đó là dict rỗng)
-```
-
-| Thao tác | Cú pháp |
-|---|---|
-| Truy cập | Chỉ có thể duyệt qua bằng vòng lặp `for` |
-| Thêm/Xóa | `add(x)`, `remove(x)` (lỗi nếu không có x), `discard(x)` (không lỗi nếu không có x) |
-| Hợp (Union) | `set1 \| set2` hoặc `set1.union(set2)` |
-| Giao (Intersection) | `set1 & set2` hoặc `set1.intersection(set2)` |
-| Hiệu (Difference) | `set1 - set2` |
-
-#### Dictionary (Từ điển)
-
-- Tổ chức theo `{key: value}`. **Key phải duy nhất**, Value cho phép trùng lặp.
-- Có thể thay đổi được. Dùng để lưu trữ thông tin (user, giao dịch, ...).
-
-```python
-my_dict = {'name': 'An', 'age': 20}
-```
-
-| Thao tác | Cú pháp |
-|---|---|
-| Truy cập | `my_dict['name']` (lỗi nếu key không tồn tại) hoặc an toàn hơn: `my_dict.get('name', 'Không thấy')` |
-| Thêm/Sửa | `my_dict['job'] = 'Dev'` (thêm mới nếu chưa có key, ghi đè nếu đã có) |
-| Xóa | `del my_dict['age']` hoặc `my_dict.pop('age')` |
-| Lấy Key | `my_dict.keys()` |
-| Lấy Value | `my_dict.values()` |
-| Lấy cặp (Key, Value) | `my_dict.items()` (dạng Tuple) |
+- **Điều kiện để một biến đổi là "Tuyến tính":**
+  - Một phép biến đổi $T$ được gọi là tuyến tính nếu đáp ứng 2 thuộc tính:
+    - **Tính cộng:** $T(\vec{u} + \vec{v}) = T(\vec{u}) + T(\vec{v})$
+    - Tính đồng nhất / Tỷ lệ: $T(c\vec{u}) = cT(\vec{u})$ với mọi số thực $c$.
+- Phép biến đổi tuyến tính giữ cho:
+  - Điểm gốc tọa độ $\vec{0}$ luôn cố định tại vị trí ban đầu ($T(\vec{0}) = \vec{0}$).
+  - Các đường thẳng vẫn là đường thẳng sau khi biến đổi (không bị uốn cong, đứt gãy).
+  - Các đường song song và cách đều vẫn song song và cách đều.
 
 ---
 
