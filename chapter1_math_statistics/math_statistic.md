@@ -23,65 +23,74 @@
 <a id="21-dai-so-tuyen-tinh"></a>
 ## 2.1 Đại số tuyến tính
 
-<a id="kieu-du-lieu--bien"></a>
-### 🔹 Kiểu dữ liệu & Biến
+<a id="vector"></a>
+### 🔹 Vectors (Véc tơ)
 
-| Loại | Mô tả | Ép kiểu |
+- Vector trong vật lý chính là các đường thằng có hướng và độ lớn. Còn trong đại số tuyến tính vector là một tập hợp của nhiều số vô hướng trong không gian
+- Cộng vector bằng cách lý phần tử chỉ số hàng i cột j của vecto này cộng với phần tử chỉ số hàng i cột j của vector kia
+- Nhân vector với một só vô hướng là lấy số đó nhân cho toàn bộ các phần tử trong vector
+- **Vecto đơn vị là vecto có độ dài bằng 1** 
+
+**Tích vô hướng**
+
+- Được định nghĩa theo hai gốc nhìn:
+  - **Đại số:**  $$\vec{a} \cdot \vec{b} = \sum_{i=1}^{n} a_i b_i = a_1 b_1 + a_2 b_2 + \dots + a_n b_n$$
+  - **Hình học:**
+    - Độ dài hình chiều vuông góc của vector a lên phương vector b sau đó nhân cho độ dài của b
+    - Độ tương đồng về hướng:
+      - **Góc nhọn ($\theta < 90^\circ$):** Dot product $> 0$ $\rightarrow$ Hai vectơ "đi cùng chiều".
+      - **Vuông góc ($\theta = 90^\circ$):** Dot product $= 0$ $\rightarrow$ Hai vectơ hoàn toàn không độc lập/không liên quan theo phương đó.
+      - **Góc tù ($\theta > 90^\circ$):** Dot product $< 0$ $\rightarrow$ Hai vectơ "ngược chiều".
+
+- Khi tích vô hướng **giữa hai vecto bằng 0**. Ta gọi chúng có tính trực giao đại diện cho các hướng hoàn toàn độc lập. Điều này giúp
+  -  Các đặc trưng trực giao với nhau chứa các thông tin không trùng hợp (Độc lập thông tin)
+  -  Giảm chiều dữ liệu loại bỏ tương quan đá biến và giữ lại biến động lớn nhất
+  -  Khởi tạo trọng số ma trận vuông dạng trực giao trong RNN/LSTM hoặc Deep CNNs giúp tránh hiện tượng bùng nổ hoặc tiêu biến Gradient (Exploding/Vanishing Gradient).
+
+**Độ dài vecto & Các dạng chuẩn (Norm)**
+
+- **Norm (Chuẩn)**: Là hàm số đo "kích thước" hoặc "độ dài" của một vectơ trong không gian.
+- **Normalization (Chuẩn hóa)**: Biến đôi một vecto khác 0 thnafh một veco cùng hướng với vecto biến đổi
+- Chuẩn hóa quan trọng là do:
+  - Giúp mô ình tập trung vào đặc trưng của dữ liệu thay vì chi phối bởi các độ lớn tuyệt đối (nhiễu)
+  - Khi dữ liệu đầu vào hoặc Feature Map được chuẩn hóa (ví dụ: Batch Normalization, Layer Normalization), không gian tối ưu hóa trở nên hình cầu thay vì hình oval méo mó, giúp thuật toán cập nhật trọng số ổn định hơn. 
+
+| Chuẩn | Công thức | Dùng trong AI |
 |---|---|---|
-| `int` | Số nguyên | `int()` |
-| `float` | Số thực | `float()` |
-| `str` | Chuỗi | `str()` |
-| `bool` | Đúng/Sai (`True`/`False`) | `bool()` |
+| **L1 - (Manhattan)** | $\Vert{}\vec{x}\Vert{}_1 = \sum \Vert{}x_i\Vert{}$ | Tổng khoảng cách di chuyển theo các trục tọa độ. Dùng trong** L1 Regularization (Lasso)** giúp triệt tiêu trọng số về $0$, tạo ra mô hình thưa (sparse model). | 
+| **L2 - (Euclidean)** | $\Vert{}\vec{x}\Vert{}_2 = \sqrt{\sum x_i^2}$ | Khoảng cách đường thẳng thực tế (khoảng cách Euclide). Dùng trong **L2 Regularization (Ridge)** để phạt các trọng số quá lớn, tránh Overfitting. | 
+| **L - (Maximum)** | $\Vert{}\vec{x}\Vert{}_\infty = \max_i \Vert{}x_i\Vert{}$ | Độ lớn của phần tử cực đại. Phổ biến trong bài toán tấn công chống đối** Adversarial Attacks (FGSM)** để giới hạn mức nhiễu tối đa thêm vào ảnh. | 
 
-- `type()`: kiểm tra kiểu dữ liệu của biến.
-- `isinstance(object, classinfo)`: kiểm tra một đối tượng có thuộc một kiểu/lớp nhất định hay không.
+**Tương đồng Cosin & Embeddings**
 
-**Mutable vs Immutable**
+- Độ tương đồng Cosin đo góc giữa hai vecto và loại bỏ yếu tố chiều dài
 
-- **Mutable**: sau khi khởi tạo có thể chỉnh sửa nội dung bên trong vùng nhớ **mà không đổi địa chỉ `id`**.
-  - Ví dụ: `list`, `dict`, `set`, `torch.Tensor`
-- **Immutable**: sau khi tạo, giá trị bên trong **không bao giờ thay đổi**. Mọi thao tác đều tạo ra đối tượng mới với vùng nhớ mới.
-  - Ví dụ: `int`, `float`, `str`, ...
+$$\text{Cosine Similarity}(\vec{a}, \vec{b}) = \cos(\theta) = \frac{\vec{a} \cdot \vec{b}}{\Vert{}\vec{a}\Vert{}_2 \Vert{}\vec{b}\Vert{}_2} = \hat{a} \cdot \hat{b}$$
 
-**Ứng dụng trong AI/MLOps Pipeline**
-
-| Thành phần Pipeline | Nên dùng kiểu | Thư viện / Data Type khuyên dùng | Rủi ro nếu làm sai | Best Practice |
-|---|---|---|---|---|
-| **Model & Pipeline Config** | Immutable | `dataclasses(frozen=True)`, `NamedTuple`, `Hydra DictConfig` | **Data Leakage / Non-reproducible Runs**: config bị sửa ngầm giữa Train/Val/Test làm mất tính đồng nhất thực nghiệm | Khóa hoàn toàn config sau khi parse. Không truyền `dict` thuần làm config cho hàm xử lý dữ liệu |
-| **Category Mapping & Class Labels** | Immutable | `tuple`, `frozenset`, `enum.Enum` | **Index Corruption**: thứ tự class ID lệch giữa Training và Inference | Khai báo hằng số mapping dạng `Tuple[str, ...]` hoặc `Enum` để cố định index |
-| **Feature Caching & Hash Keys** | Immutable | `str`, `tuple`, `bytes` | **TypeError (Unhashable)**: `@lru_cache`/Redis key cần input hashable | Ép kiểu tham số sang `tuple`/`str` trước khi truyền vào hàm cache |
-| **Dataset In-Memory Buffers** | Mutable | `torch.Tensor`, `np.ndarray`, `pandas.DataFrame` | **OOM**: lạm dụng Immutable (copy liên tục) làm tràn RAM/VRAM | Dùng Mutable nhưng **hạn chế in-place operation** (`inplace=True`, `tensor.add_()`) |
-| **Data Augmentation & Preprocessing** | Immutable (Input) / Mutable (Output) | PyTorch `Transforms`, `albumentations` | **Dataset Corruption**: biến đổi trực tiếp trên mảng gốc làm dữ liệu epoch này đè epoch khác | Luôn trả về tensor/array mới (`copy()`) trong `__getitem__` của DataLoader |
-| **Experiment Metrics & State Logging** | Mutable | `MLflow`, `W&B`, `list`/`dict` tự quản lý | **Missing Logs / Race Conditions**: dùng hằng số/tuple khiến append metric cồng kềnh | Gom metric vào `dict` tạm, ghi sang tracking system rồi giải phóng bộ nhớ |
+- Giá trị luôn nằm trong khoảng $[-1, 1]$:
+  - $1$: Cùng hướng hoàn toàn.
+  - $0$: Trực giao (không liên quan).
+  - $-1$: Ngược hướng hoàn toàn.
+ 
+- **Embedding:** Mỗi từ/đoạn văn/hình ảnh được chuyển thành một vectơ cao chiều (ví dụ: $768$ hoặc $1536$ chiều).
+  - Hướng của vectơ đại diện cho ý nghĩa ngữ nghĩa (semantic meaning).
+  - Độ dài của vectơ đôi khi phản ánh tần suất xuất hiện hoặc độ dài câu (nhiễu). 
 
 ---
 
-<a id="chuoi-string"></a>
-### 🔹 Chuỗi (String)
+<a id="ma-tran"></a>
+### 🔹 Ma trận (Matrices)
 
-- **Cắt chuỗi**: `s[start:stop:step]`
-  - `start`: vị trí bắt đầu cắt
-  - `stop`: vị trí kết thúc cắt
-  - `step`: bước nhảy cắt
+- Là tập hợp nhiều vecto lại với nhau tổ chức thành các hàng hoặc cột
 
-| Hàm | Chức năng |
+**Phép toán ma trận**:
+
+| Phép toán | Cách làm |
 |---|---|
-| `split()` | Chia chuỗi theo ký tự (mặc định `" "`) |
-| `join()` | Gộp chuỗi theo ký tự chèn vào |
-| `strip()` | Loại bỏ khoảng trắng đầu/cuối chuỗi |
-| `replace()` | Thay thế chuỗi |
-| `find()` | Tìm kiếm ký tự trong chuỗi |
-| `startswith(obj)` | Kiểm tra bắt đầu bằng `obj` |
-| `endswith(obj)` | Kiểm tra kết thúc bằng `obj` |
+| **Cộng ma trận** | Phần tử hàng i cột j của ma trận này cộng với hàng i cột j ma trận kia |
+| **Nhân ma trận** | Phần tử hàng i cột j của ma trận nhân với hàng j cột i của ma trận kia rồi cộng chúng lại|
+| **Chuyển vị** | Chuyển các phần tử hàng cảu ma rận thành cột và ngược lại |
 
-```python
-# f-string: {} chứa biến cần in ra màn hình
-value = f"value is {x:.2f}"
-
-# Chuỗi dài dùng dấu ba nháy
-text = """Đây là một
-chuỗi nhiều dòng"""
-```
 
 ---
 
