@@ -151,6 +151,110 @@ $$\text{Rank}(A) \le \min(\text{số hàng}, \text{số cột})$$
   - Điểm gốc tọa độ $\vec{0}$ luôn cố định tại vị trí ban đầu ($T(\vec{0}) = \vec{0}$).
   - Các đường thẳng vẫn là đường thẳng sau khi biến đổi (không bị uốn cong, đứt gãy).
   - Các đường song song và cách đều vẫn song song và cách đều.
+  - 
+**Phương trình thừa định và Bài toán tối ưu hóa**
+
+- Một hệ phương trình $A x = b$ với $A \in \mathbb{R}^{m \times n}$ được gọi là **Overdetermined system (Hệ thừa định)** khi số lượng phương trình (mẫu dữ liệu $m$) nhiều hơn số lượng ẩn (đặc trưng $n$), tức $m > n$.
+  - Trong thực tế Machine Learning, số lượng mẫu dữ liệu luôn lớn hơn rất nhiều so với số lượng thuộc tính ($m \gg n$). Do đó, thông thường sẽ **không tồn tại** nghiệm $x$ chính xác tuyệt đối để thỏa mãn đồng thời tất cả các phương trình.
+
+- **Giải pháp Bình phương tối thiểu (Least Squares):**
+  - Do không thể giải chính xác $A x = b$, mục tiêu chuyển sang tìm một vectơ $x^*$ sao cho khoảng cách giữa $A x^*$ và $b$ là nhỏ nhất có thể.
+  - Bài toán được phát biểu dưới dạng tối ưu hóa sai số chuẩn $L_2$ bình phương:
+    $$\min_x \|A x - b\|_2^2$$
+  - **Nghiệm dạng đóng (Closed-form solution):**
+    $$x^* = (A^T A)^{-1} A^T b$$
+  - Ma trận $A^+ = (A^T A)^{-1} A^T \in \mathbb{R}^{n \times m}$ được gọi là **Giả nghịch đảo Moore-Penrose** (Moore-Penrose Pseudoinverse) của ma trận $A$.
+
+**Định nghĩa và các tính chất trong Học máy (Vết ma trận)**
+
+- **Định nghĩa:** Với một ma trận vuông $A \in \mathbb{R}^{n \times n}$, **Trace** (ký hiệu $\text{Tr}(A)$) là tổng tất cả các phần tử nằm trên đường chéo chính:
+  $$\text{Tr}(A) = \sum_{i=1}^n a_{ii} = a_{11} + a_{22} + \dots + a_{nn}$$
+
+- **Các tính chất quan trọng:**
+  - **Tính tuần hoàn (Cyclic Property):** Vết của tích các ma trận không đổi khi hoán vị vòng quanh các ma trận:
+    $$\text{Tr}(ABC) = \text{Tr}(BCA) = \text{Tr}(CAB)$$
+    - *Ứng dụng:* Cực kỳ hữu ích trong việc tính đạo hàm và biến đổi các hàm mất mát (loss function) dạng ma trận.
+  - **Mối liên hệ với Trị riêng:** Trace của ma trận $A$ đúng bằng tổng các trị riêng của nó:
+    $$\text{Tr}(A) = \sum_{i=1}^n \lambda_i$$
+  - **Ý nghĩa trong Ma trận Hiệp phương sai (Covariance Matrix):** Trong thuật toán PCA, $\text{Tr}(\Sigma)$ đại diện cho **tổng phương sai (total variance)** của toàn bộ tập dữ liệu.
+
+---
+
+<a id="phan-ra"></a>
+### 🔹 Phân rã Ma trận (Matrix Decompositions)
+
+**Bản chất và Mục đích**
+
+- **Bản chất:** Giống như việc phân tích một số nguyên thành tích các số nguyên tố (như $12 = 2 \times 2 \times 3$), **Matrix Decomposition** là quá trình tách một ma trận phức tạp thành tích của hai hoặc nhiều ma trận đơn giản hơn (như ma trận tam giác, ma trận đường chéo, hoặc ma trận trực giao).
+
+- **Vai trò trong AI Engineeering:**
+  - **Tối ưu hóa tính toán:** Giúp giải hệ phương trình tuyến tính quy mô lớn nhanh hơn và ổn định hơn về mặt số học (VD: Phân rã LU, Phân rã Cholesky, Phân rã QR).
+  - **Trích xuất đặc trưng và Giảm chiều dữ liệu:** Biến đổi dữ liệu sang không gian mới để loại bỏ nhiễu và nén thông tin (VD: Eigendecomposition, SVD).
+
+**Phân rã Giá trị Đơn lẻ**
+
+- **Bản chất hình học:** Khi nhân một ma trận $A \in \mathbb{R}^{n \times n}$ với một vectơ $x \in \mathbb{R}^n$, về mặt hình học ma trận $A$ sẽ biến đổi $x$ bằng cách **co giãn** và **xoay hướng**.
+
+- **Định nghĩa:**
+  - **Eigenvector ($\vec{v} \neq \vec{0}$):** Là một vectơ đặc biệt mà khi bị biến đổi bởi $A$, hướng của nó **không bị thay đổi** (chỉ bị kéo giãn, thu ngắn hoặc đảo chiều).
+  - **Eigenvalue ($\lambda \in \mathbb{R}$):** Là hệ số tỉ lệ co giãn của Eigenvector tương ứng.
+
+- **Phương trình đặc trưng:**
+  $$A \vec{v} = \lambda \vec{v}$$
+  - Phương trình tương đương để tìm $\lambda$:
+    $$\det(A - \lambda I) = 0$$
+
+- **Trực quan hóa:** Nếu ma trận $A$ biểu diễn một biến đổi lực tác động lên vật thể, Eigenvectors chỉ ra các **trục biến dạng tự nhiên** của vật thể, còn Eigenvalues cho biết **độ phóng đại** trên từng trục đó.
+
+**Đo lường Phương sai và Lựa chọn Thành phần Chính**
+
+- Thuật toán **PCA (Principal Component Analysis)** hướng tới việc tìm các trục tọa độ mới sao cho khi chiếu dữ liệu lên đó, lượng thông tin giữ lại (đo bằng **phương sai - variance**) là lớn nhất.
+
+- **Quy trình toán học của PCA:**
+  1. Tính ma trận hiệp phương sai của dữ liệu đã chuẩn hóa: $C = \frac{1}{m} X^T X$.
+  2. Thực hiện phân rã trị riêng (Eigendecomposition) trên $C$:
+     $$C \vec{v}_i = \lambda_i \vec{v}_i$$
+  3. **Ý nghĩa của từng thành phần:**
+     - Các **Eigenvectors ($\vec{v}_i$)** chính là hướng của các trục tọa độ mới (**Principal Components**).
+     - Các **Eigenvalues ($\lambda_i$)** đo lường trực tiếp độ lớn của phương sai dữ liệu trên trục $\vec{v}_i$ tương ứng.
+
+- **Tỷ lệ thông tin giữ lại (Explained Variance Ratio):**
+  - Tỷ lệ thông tin được bảo toàn bởi $k$ thành phần chính đầu tiên được tính bằng:
+    $$\text{Ratio}_k = \frac{\sum_{i=1}^k \lambda_i}{\sum_{j=1}^n \lambda_j}$$
+  - **Kết luận:** Eigenvalue càng lớn $\rightarrow$ Trục tọa độ tương ứng càng chứa nhiều thông tin cốt lõi của dữ liệu.
+
+**Phân rã Giá trị Đơn lẻ**
+
+- **Tính tổng quát:** Eigendecomposition chỉ áp dụng được cho ma trận vuông. **SVD** là phương pháp tổng quát hóa áp dụng cho **mọi ma trận** $A \in \mathbb{R}^{m \times n}$.
+
+- **Công thức Phân rã:**
+  $$A = U \Sigma V^T$$
+  - $U \in \mathbb{R}^{m \times m}$: Ma trận trực giao chứa các **Left-singular vectors** (Các vectơ đơn lẻ trái).
+  - $\Sigma \in \mathbb{R}^{m \times n}$: Ma trận đường chéo chứa các **Singular values** ($\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_{\min(m,n)} \ge 0$).
+  - $V \in \mathbb{R}^{n \times n}$: Ma trận trực giao chứa các **Right-singular vectors** (Các vectơ đơn lẻ phải).
+
+- **Hình học hóa Biến đổi SVD:** Mọi phép biến đổi tuyến tính qua $A$ đều được phân rã thành 3 bước nối tiếp nhau:
+  1. $V^T$: **Xoay không gian đầu vào** (Chuyển sang hệ cơ sở mới).
+  2. $\Sigma$: **Co giãn theo các trục tọa độ** với tỷ lệ chính là các giá trị $\sigma_i$.
+  3. $U$: **Xoay không gian để đưa về không gian đầu ra**.
+
+**Truncated SVD và Xấp xỉ Hạng thấp**
+
+- **Trượt cắt SVD (Truncated SVD):**
+  - Do các giá trị $\sigma_i$ trong $\Sigma$ được sắp xếp giảm dần, các giá trị $\sigma_i$ đầu tiên giữ phần lớn "năng lượng/thông tin" của ma trận.
+  - Ta có thể giữ lại $k$ giá trị lớn nhất ($k \ll \min(m,n)$) và bỏ đi các phần còn lại để tạo ma trận xấp xỉ hạng $k$:
+    $$A \approx A_k = U_k \Sigma_k V_k^T$$
+  - **Định lý Eckart–Young:** $A_k$ là ma trận có hạng $k$ tối ưu nhất để xấp xỉ ma trận gốc $A$ theo chuẩn Frobenius.
+
+- **Liên hệ giữa SVD và PCA:**
+  - Giả sử tập dữ liệu $X \in \mathbb{R}^{m \times n}$ đã được chuẩn hóa (đã trừ đi trung bình từng cột).
+  - Nếu phân rã SVD cho $X$: $X = U \Sigma V^T$.
+  - Ma trận hiệp phương sai sẽ là:
+    $$C = \frac{1}{m} X^T X = \frac{1}{m} (U \Sigma V^T)^T (U \Sigma V^T) = \frac{1}{m} V \Sigma^T U^T U \Sigma V^T = V \left( \frac{\Sigma^2}{m} \right) V^T$$
+  - **Kết luận:**
+    - Ma trận $V$ thu được từ SVD của $X$ chính là ma trận chứa các **Eigenvectors** của $X^T X$ (Trục PCA).
+    - Trị riêng $\lambda_i$ trong PCA liên hệ với Singular Value $\sigma_i$ qua công thức: $\lambda_i = \frac{\sigma_i^2}{m}$.
+    - Trong các thư viện thực tế (như `scikit-learn`), thuật toán PCA luôn sử dụng SVD để tính toán vì tính **ổn định số học (numerical stability)** vượt trội so với việc tính ma trận hiệp phương sai trực tiếp.
 
 ---
 
